@@ -1,8 +1,8 @@
 package com.app.servicos.service;
 
-import com.app.servicos.entity.Clientes;
+import com.app.servicos.entity.Endereco;
 import com.app.servicos.entity.OrdemDeServico;
-import com.app.servicos.repository.ClienteRepository;
+import com.app.servicos.repository.ClientePFRepository;
 import com.app.servicos.repository.OrdemDeServicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,20 +14,20 @@ import java.util.Optional;
 public class OrdemDeServicoService {
 
     private final OrdemDeServicoRepository ordemDeServicoRepository;
-    private final ClienteRepository clienteRepository;
+    private final ClientePFRepository clientePFRepository;
 
     @Autowired
-    public OrdemDeServicoService(OrdemDeServicoRepository ordemDeServicoRepository, ClienteRepository clienteRepository) {
+    public OrdemDeServicoService(OrdemDeServicoRepository ordemDeServicoRepository, ClientePFRepository clientePFRepository) {
         this.ordemDeServicoRepository = ordemDeServicoRepository;
-        this.clienteRepository = clienteRepository;
+        this.clientePFRepository = clientePFRepository;
     }
 
     public OrdemDeServico criarOrdemDeServicoComCliente(Long clienteId, OrdemDeServico ordemDeServico) {
-        Clientes cliente = clienteRepository.findById(clienteId).orElse(null);
-        if (cliente == null) {
+        Endereco endereco = clientePFRepository.findById(clienteId).orElse(null).getEndereco();
+        if (endereco == null) {
             throw new IllegalArgumentException("Cliente não encontrado com ID: " + clienteId);
         }
-        ordemDeServico.setCliente(cliente);
+        ordemDeServico.setId(clienteId);
         ordemDeServico.setCustoServico(ordemDeServico.getCustoServico());
         ordemDeServico.setCustoAdicional(ordemDeServico.getCustoAdicional());
 

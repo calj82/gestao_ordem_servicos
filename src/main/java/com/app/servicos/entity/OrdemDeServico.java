@@ -7,7 +7,6 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
-@Data
 @Table(name = "ordem_servico")
 @Getter
 @Setter
@@ -34,10 +33,5 @@ public class OrdemDeServico {
 
     @Column(name =  "custo_total")
     private double custoTotal;
-
-    @ManyToOne
-    @JoinColumn(name = "cliente_id")
-    private Clientes cliente;
-
 
 }
