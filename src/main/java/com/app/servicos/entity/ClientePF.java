@@ -1,10 +1,14 @@
 package com.app.servicos.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "cliente_pf")
@@ -29,4 +33,8 @@ public class ClientePF extends Cliente{
 
     @Column(name = "idade")
     private String idade;
+
+    @OneToMany(mappedBy = "clientePF", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<OrdemDeServico> ordensDeServico = new ArrayList<>();
 }
