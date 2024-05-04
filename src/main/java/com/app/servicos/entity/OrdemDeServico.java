@@ -1,5 +1,6 @@
 package com.app.servicos.entity;
 
+import com.app.servicos.enums.TipoCliente;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,5 +34,17 @@ public class OrdemDeServico {
 
     @Column(name =  "custo_total")
     private double custoTotal;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_cliente")
+    private TipoCliente tipoCliente;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_pj_id")
+    private ClientePJ clientePJ;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_pf_id")
+    private ClientePF clientePF;
 
 }

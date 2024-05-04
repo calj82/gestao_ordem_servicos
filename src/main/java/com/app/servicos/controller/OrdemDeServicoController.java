@@ -1,6 +1,7 @@
 package com.app.servicos.controller;
 
 import com.app.servicos.entity.OrdemDeServico;
+import com.app.servicos.enums.TipoCliente;
 import com.app.servicos.repository.OrdemDeServicoRepository;
 import com.app.servicos.service.OrdemDeServicoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,10 @@ public class OrdemDeServicoController {
         this.ordemDeServicoService = ordemDeServicoService;
     }
 
-    @PostMapping("/criar-ordem-cliente/{clienteId}")
-    public ResponseEntity<OrdemDeServico> criarOrdemDeServicoComCliente(@PathVariable Long clienteId, @RequestBody OrdemDeServico ordemDeServico) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ordemDeServicoService.criarOrdemDeServicoComCliente(clienteId, ordemDeServico));
+    @PostMapping("/criar/{clienteId}")
+    public ResponseEntity<OrdemDeServico> criarOrdemDeServicoComCliente(@PathVariable Long clienteId, @RequestParam TipoCliente tipoCliente,
+                                                                        @RequestBody OrdemDeServico ordemDeServico) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ordemDeServicoService.criarOrdemDeServico(clienteId, tipoCliente, ordemDeServico));
     }
 
     @GetMapping
@@ -32,27 +34,21 @@ public class OrdemDeServicoController {
         return ordemDeServicoService.listarOrdensDeServico();
     }
 
-    @GetMapping("/{ordemDeServicoId}")
-    public ResponseEntity<OrdemDeServico> buscarOrdemDeServicoPorId(@PathVariable Long ordemDeServicoId) {
-        Optional<OrdemDeServico> ordemDeServico = ordemDeServicoService.buscarOrdemDeServicoPorId(ordemDeServicoId);
+    @GetMapping("/{id}")
+    public ResponseEntity<OrdemDeServico> buscarOrdemDeServicoPorId(@PathVariable Long id) {
+        Optional<OrdemDeServico> ordemDeServico = ordemDeServicoService.buscarOrdemDeServicoPorId(id);
         return ordemDeServico.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/criar-ordem")
-    public ResponseEntity<OrdemDeServico> criarOrdemDeServico(@RequestBody OrdemDeServico ordemDeServico) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ordemDeServicoService.criarOrdemDeServico(ordemDeServico));
-    }
-
-    @PutMapping("/{ordemDeServicoId}")
-    public ResponseEntity<OrdemDeServico> atualizarOrdemDeServico(@PathVariable Long ordemDeServicoId, @RequestBody OrdemDeServico ordemDeServicoAtualizada) {
-        Optional<OrdemDeServico> ordemDeServico = ordemDeServicoService.
-                atualizarOrdemDeServico(ordemDeServicoId, ordemDeServicoAtualizada);
+    @PutMapping("/{id}")
+    public ResponseEntity<OrdemDeServico> atualizarOrdemDeServico(@PathVariable Long id, @RequestBody OrdemDeServico ordemDeServicoAtualizada) {
+        Optional<OrdemDeServico> ordemDeServico = ordemDeServicoService.atualizarOrdemDeServico(id, ordemDeServicoAtualizada);
         return ordemDeServico.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/{ordemDeServicoId}")
-    public ResponseEntity<Void> excluirOrdemDeServico(@PathVariable Long ordemDeServicoId) {
-        ordemDeServicoService.excluirOrdemDeServico(ordemDeServicoId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirOrdemDeServico(@PathVariable Long id) {
+        ordemDeServicoService.excluirOrdemDeServico(id);
         return ResponseEntity.noContent().build();
     }
 

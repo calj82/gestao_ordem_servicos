@@ -1,8 +1,8 @@
 package com.app.servicos.service;
 
+import com.app.servicos.entity.ClientePJ;
 import com.app.servicos.entity.Endereco;
-import com.app.servicos.entity.ClientePF;
-import com.app.servicos.repository.ClientePFRepository;
+import com.app.servicos.repository.ClientePJRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,18 +11,18 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class ClientePFService {
+public class ClientePJService {
 
-    private final ClientePFRepository clientePFRepository;
+    private final ClientePJRepository clientePJRepository;
     private final CepService cepService;
 
     @Autowired
-    public ClientePFService(ClientePFRepository clientePFRepository, CepService cepService) {
-        this.clientePFRepository = clientePFRepository;
+    public ClientePJService(ClientePJRepository clientePJRepository, CepService cepService) {
+        this.clientePJRepository = clientePJRepository;
         this.cepService = cepService;
     }
 
-    public ResponseEntity<ClientePF> criarClientePF(ClientePF cliente) {
+    public ResponseEntity<ClientePJ> criarClientePJ(ClientePJ cliente) {
         if (cliente.getEndereco() != null && cliente.getEndereco().getCep() != null && !cliente.getEndereco().getCep().isEmpty()) {
             EnderecoCep enderecoCep = cepService.consultarCep(cliente.getEndereco().getCep());
             if (enderecoCep != null) {
@@ -35,27 +35,26 @@ public class ClientePFService {
             }
         }
 
-        ClientePF novoCliente = clientePFRepository.save(cliente);
+        ClientePJ novoCliente = clientePJRepository.save(cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoCliente);
     }
 
-    public ResponseEntity<ClientePF> buscarClientePF(Long clienteId) {
-        Optional<ClientePF> clienteOptional = clientePFRepository.findById(clienteId);
+    public ResponseEntity<ClientePJ> buscarClientePJ(Long clienteId) {
+        Optional<ClientePJ> clienteOptional = clientePJRepository.findById(clienteId);
         return clienteOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<ClientePF> atualizarClientePF(Long clienteId, ClientePF clienteAtualizado) {
-        Optional<ClientePF> clienteExistenteOptional = clientePFRepository.findById(clienteId);
+    public ResponseEntity<ClientePJ> atualizarClientePJ(Long clienteId, ClientePJ clienteAtualizado) {
+        Optional<ClientePJ> clienteExistenteOptional = clientePJRepository.findById(clienteId);
         if (clienteExistenteOptional.isPresent()) {
-            ClientePF clienteExistente = clienteExistenteOptional.get();
+            ClientePJ clienteExistente = clienteExistenteOptional.get();
 
-            // Atualiza os campos do clientePF existente apenas se forem fornecidos na atualização
-            clienteExistente.setNome(clienteAtualizado.getNome() != null ? clienteAtualizado.getNome() : clienteExistente.getNome());
-            clienteExistente.setCpf(clienteAtualizado.getCpf() != null ? clienteAtualizado.getCpf() : clienteExistente.getCpf());
-            clienteExistente.setDataNascimento(clienteAtualizado.getDataNascimento() != null ? clienteAtualizado.getDataNascimento() : clienteExistente.getDataNascimento());
-            clienteExistente.setIdade(clienteAtualizado.getIdade() != null ? clienteAtualizado.getIdade() : clienteExistente.getIdade());
+            // Atualiza os campos do clientePJ existente apenas se forem fornecidos na atualização
+            clienteExistente.setRazaoSocial(clienteAtualizado.getRazaoSocial() != null ? clienteAtualizado.getRazaoSocial() : clienteExistente.getRazaoSocial());
+            clienteExistente.setCnpj(clienteAtualizado.getCnpj() != null ? clienteAtualizado.getCnpj() : clienteExistente.getCnpj());
+            clienteExistente.setNomeFantasia(clienteAtualizado.getNomeFantasia() != null ? clienteAtualizado.getNomeFantasia() : clienteExistente.getNomeFantasia());
 
-            // Atualizar os campos da cliente incorporada ao clientePF apenas se forem fornecidos na atualização
+            // Atualizar os campos da classe Endereço incorporada ao clientePJ apenas se forem fornecidos na atualização
             Endereco enderecoInfo = clienteExistente.getEndereco();
             enderecoInfo.setEndereco(clienteAtualizado.getEndereco().getEndereco() != null ? clienteAtualizado.getEndereco().getEndereco() : enderecoInfo.getEndereco());
             enderecoInfo.setNumero(clienteAtualizado.getEndereco().getNumero() != null ? clienteAtualizado.getEndereco().getNumero() : enderecoInfo.getNumero());
@@ -74,21 +73,19 @@ public class ClientePFService {
                 }
             }
 
-            ClientePF clienteAtualizadoEntity = clientePFRepository.save(clienteExistente);
+            ClientePJ clienteAtualizadoEntity = clientePJRepository.save(clienteExistente);
             return ResponseEntity.ok(clienteAtualizadoEntity);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-    public ResponseEntity<Void> deletarClientePF(Long clienteId) {
-        if (clientePFRepository.existsById(clienteId)) {
-            clientePFRepository.deleteById(clienteId);
+    public ResponseEntity<Void> deletarClientePJ(Long clienteId) {
+        if (clientePJRepository.existsById(clienteId)) {
+            clientePJRepository.deleteById(clienteId);
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 }
-
-
