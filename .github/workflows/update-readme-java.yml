@@ -2,7 +2,7 @@ name: Update README for Java Project
 on:
   push:
     branches:
-      - main
+      - main # ou a branch que você deseja monitorar
   schedule:
     - cron: '0 0 * * *' # Executa todos os dias à meia-noite
 
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Isso garante que todo o histórico e tags sejam baixados
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
@@ -26,24 +26,34 @@ jobs:
 
       - name: Update README
         run: |
-          # Descrição do projeto - Read-me em teste!
+          echo "# Esta é uma Documentação - em teste Javadoc" >> README.md
+          echo "" >> README.md
+          
           echo "Documentação atualizada em $(date)" >> README.md
           PR_TITLE=$(git log -1 --pretty=%B)
+          echo "" >> README.md
           echo "## Changelog" >> README.md
           echo "- ${PR_TITLE}" >> README.md
+          
           # Adiciona a versão atual do projeto
           if git rev-list --tags --max-count=1 | xargs git describe --tags > /dev/null 2>&1; then
             PROJECT_VERSION=$(git describe --tags `git rev-list --tags --max-count=1`)
+            echo "" >> README.md
             echo "## Versão Atual" >> README.md
             echo "- ${PROJECT_VERSION}" >> README.md
           else
+            echo "" >> README.md
             echo "## Versão Atual" >> README.md
             echo "- Sem versão de tag disponível" >> README.md
           fi
+          
           # Lista de autores das mudanças
+          echo "" >> README.md
           echo "## Autores das Mudanças" >> README.md
           git log --format="%an" | sort | uniq | while read author; do echo "- ${author}"; done >> README.md
-          # Link para a documentação gerada - em teste
+          
+          # Link para a documentação gerada
+          echo "" >> README.md
           echo "## Documentação" >> README.md
           echo "- [Javadoc](path/to/javadoc/index.html)" >> README.md
 
