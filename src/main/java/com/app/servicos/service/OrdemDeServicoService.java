@@ -1,18 +1,22 @@
 package com.app.servicos.service;
 
+import com.app.servicos.dto.response.OrdemResponseDTO;
 import com.app.servicos.entity.ClientePF;
 import com.app.servicos.entity.ClientePJ;
 import com.app.servicos.entity.OrdemDeServico;
 import com.app.servicos.enums.StatusServico;
 import com.app.servicos.enums.TipoCliente;
+import com.app.servicos.mapper.OrdemServicoMapper;
 import com.app.servicos.repository.ClientePFRepository;
 import com.app.servicos.repository.ClientePJRepository;
 import com.app.servicos.repository.OrdemDeServicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrdemDeServicoService {
@@ -35,23 +39,19 @@ public class OrdemDeServicoService {
 
         switch (tipoCliente) {
             case PF:
-                ClientePF clientePF = clientePFRepository.findById(clienteId).orElse(null);
-                if (clientePF == null) {
-                    throw new IllegalArgumentException("Cliente PF não encontrado com ID: " + clienteId);
-                }
-                ordemDeServico.setTipoCliente(TipoCliente.PF);
-                ordemDeServico.setClientePF(clientePF);
-
+                clientePFRepository.findById(clienteId)
+                        .ifPresentOrElse(
+                                clientePF -> configurarOrdemDeServicoParaPF(ordemDeServico, clientePF),
+                                () -> { throw new IllegalArgumentException("Cliente PF não encontrado com ID: " + clienteId);
+                                });
                 break;
 
             case PJ:
-                ClientePJ clientePJ = clientePJRepository.findById(clienteId).orElse(null);
-                if (clientePJ == null) {
-                    throw new IllegalArgumentException("Cliente PJ não encontrado com ID: " + clienteId);
-                }
-                ordemDeServico.setTipoCliente(TipoCliente.PJ);
-                ordemDeServico.setClientePJ(clientePJ);
-
+                clientePJRepository.findById(clienteId)
+                        .ifPresentOrElse(
+                                clientePJ -> configurarOrdemDeServicoParaPJ (ordemDeServico, clientePJ),
+                        () -> { throw new IllegalArgumentException("Cliente PJ não encontrado com ID: " + clienteId);
+                                });
                 break;
 
             default:
@@ -61,9 +61,17 @@ public class OrdemDeServicoService {
         return ordemDeServicoRepository.save(ordemDeServico);
     }
 
-    public Optional<List<OrdemDeServico>> listarOrdensDeServico() {
+    public Optional<List<OrdemResponseDTO>> listarOrdensDeServico() {
         List<OrdemDeServico> ordens = ordemDeServicoRepository.findAll();
-        return ordens.isEmpty() ? Optional.empty() : Optional.of(ordens);
+        if (ordens.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<OrdemResponseDTO> dtos = ordens.stream()
+                .map(OrdemServicoMapper::mapToDto)
+                .collect(Collectors.toList());
+
+        return Optional.of(dtos);
     }
 
     public Optional<OrdemDeServico> buscarOrdemDeServicoPorId(Long id) {
@@ -87,7 +95,7 @@ public class OrdemDeServicoService {
                 ordemDeServico.getStatusServico());
 
         if(ordemDeServico.getStatusServico() == StatusServico.FECHADO){
-            double custoTotal = calculadoraCustoService.calcularCustoTotal(ordemDeServicoId);
+            BigDecimal custoTotal = calculadoraCustoService.calcularCustoTotal(ordemDeServicoId);
             ordemDeServicoAtualizada.setCustoTotal(custoTotal);
 
         }
@@ -98,10 +106,20 @@ public class OrdemDeServicoService {
         ordemDeServicoRepository.deleteById(ordemDeServicoId);
     }
 
+
+
     private void verificarSeOrdemDeServicoEstaFechada(OrdemDeServico ordemDeServico) {
         if (ordemDeServico.getStatusServico() == StatusServico.FECHADO) {
             throw new RuntimeException("A ordem de serviço já está fechada.");
         }
+    }
+
+    private void configurarOrdemDeServicoParaPF(OrdemDeServico ordemDeServico, ClientePF clientePF) {
+        ordemDeServico.setClientePF(clientePF);
+    }
+
+    private void configurarOrdemDeServicoParaPJ(OrdemDeServico ordemDeServico, ClientePJ clientePJ) {
+        ordemDeServico.setClientePJ(clientePJ);
     }
 
 }

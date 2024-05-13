@@ -4,6 +4,7 @@ import com.app.servicos.entity.OrdemDeServico;
 import com.app.servicos.repository.OrdemDeServicoRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -15,17 +16,17 @@ public class CalculadoraCustoService {
         this.ordemDeServicoRepository = ordemDeServicoRepository;
     }
 
-    public double calcularCustoTotal(Long ordemDeServicoId) {
+    public BigDecimal calcularCustoTotal(Long ordemDeServicoId) {
         Optional<OrdemDeServico> ordemDeServicoOptional = ordemDeServicoRepository.findById(ordemDeServicoId);
         if (ordemDeServicoOptional.isEmpty()) {
             throw new IllegalArgumentException("Ordem de serviço não encontrada com ID: " + ordemDeServicoId);
         }
 
         OrdemDeServico ordemDeServico = ordemDeServicoOptional.get();
-        double custoServico = ordemDeServico.getCustoServico();
-        double custoAdicional = ordemDeServico.getCustoAdicional();
+        var custoServico = ordemDeServico.getCustoServico();
+        var custoAdicional = ordemDeServico.getCustoAdicional();
 
-        double custoTotal = custoServico + custoAdicional;
+        var custoTotal = custoServico.add(custoAdicional);
 
         ordemDeServico.setCustoTotal(custoTotal);
         ordemDeServicoRepository.save(ordemDeServico);
