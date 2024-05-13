@@ -37,6 +37,7 @@ jobs:
           
           # Adiciona a versão atual do projeto
           if git rev-list --tags --max-count=1 | xargs git describe --tags > /dev/null 2>&1; then
+            echo "## Commit" >> README.md
             PROJECT_VERSION=$(git describe --tags `git rev-list --tags --max-count=1`)
             echo "" >> README.md
             echo "## Versão Atual" >> README.md
