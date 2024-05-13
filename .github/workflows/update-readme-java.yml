@@ -1,5 +1,4 @@
 name: Update README for Java Project
-
 on:
   push:
     branches:
@@ -30,10 +29,8 @@ jobs:
           echo "## Changelog" >> README.md
           echo "- ${PR_TITLE}" >> README.md
 
-      - name: Commit and push if changed
-        run: |
-          git config --global user.email "carlos.laczynski@zup.com.br"
-          git config --global user.name "carloslaczynskizup"
-          git add README.md
-          git commit -m "Atualizado README com documentação Javadoc" -a || echo "Nenhuma mudança no README"
-          git push
+      - name: Archive README
+        uses: actions/upload-artifact@v2
+        with:
+          name: Updated-README
+          path: README.md
