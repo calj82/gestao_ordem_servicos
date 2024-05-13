@@ -3,6 +3,7 @@ package com.app.servicos.service;
 import com.app.servicos.entity.ClientePF;
 import com.app.servicos.entity.ClientePJ;
 import com.app.servicos.entity.OrdemDeServico;
+import com.app.servicos.enums.StatusServico;
 import com.app.servicos.enums.TipoCliente;
 import com.app.servicos.repository.ClientePFRepository;
 import com.app.servicos.repository.ClientePJRepository;
@@ -19,12 +20,14 @@ public class OrdemDeServicoService {
     private final OrdemDeServicoRepository ordemDeServicoRepository;
     private final ClientePFRepository clientePFRepository;
     private final ClientePJRepository clientePJRepository;
+    private final CalculadoraCustoService calculadoraCustoService;
 
     @Autowired
-    public OrdemDeServicoService(OrdemDeServicoRepository ordemDeServicoRepository, ClientePFRepository clientePFRepository, ClientePJRepository clientePJRepository) {
+    public OrdemDeServicoService(OrdemDeServicoRepository ordemDeServicoRepository, ClientePFRepository clientePFRepository, ClientePJRepository clientePJRepository, CalculadoraCustoService calculadoraCustoService) {
         this.ordemDeServicoRepository = ordemDeServicoRepository;
         this.clientePFRepository = clientePFRepository;
         this.clientePJRepository = clientePJRepository;
+        this.calculadoraCustoService = calculadoraCustoService;
     }
 
 
@@ -73,13 +76,32 @@ public class OrdemDeServicoService {
         if (ordemDeServicoExistente.isEmpty()) {
             throw new RuntimeException("Ordem de serviço não encontrada para o ID: " + ordemDeServicoId);
         }
+
         OrdemDeServico ordemDeServico = ordemDeServicoExistente.get();
-        ordemDeServico.setDescricaoServico(ordemDeServicoAtualizada.getDescricaoServico());
+
+        verificarSeOrdemDeServicoEstaFechada(ordemDeServico);
+
+        ordemDeServico.setDescricaoServico(ordemDeServicoAtualizada.getDescricaoServico() != null ? ordemDeServicoAtualizada.getDescricaoServico() :
+                ordemDeServico.getDescricaoServico());
+        ordemDeServico.setStatusServico(ordemDeServicoAtualizada.getStatusServico() != null ? ordemDeServicoAtualizada.getStatusServico() :
+                ordemDeServico.getStatusServico());
+
+        if(ordemDeServico.getStatusServico() == StatusServico.FECHADO){
+            double custoTotal = calculadoraCustoService.calcularCustoTotal(ordemDeServicoId);
+            ordemDeServicoAtualizada.setCustoTotal(custoTotal);
+
+        }
         return Optional.of(ordemDeServicoRepository.save(ordemDeServico));
     }
 
     public void excluirOrdemDeServico(Long ordemDeServicoId) {
         ordemDeServicoRepository.deleteById(ordemDeServicoId);
+    }
+
+    private void verificarSeOrdemDeServicoEstaFechada(OrdemDeServico ordemDeServico) {
+        if (ordemDeServico.getStatusServico() == StatusServico.FECHADO) {
+            throw new RuntimeException("A ordem de serviço já está fechada.");
+        }
     }
 
 }

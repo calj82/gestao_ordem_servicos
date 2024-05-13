@@ -1,6 +1,7 @@
 package com.app.servicos.controller;
 
 import com.app.servicos.entity.OrdemDeServico;
+import com.app.servicos.enums.StatusServico;
 import com.app.servicos.enums.TipoCliente;
 import com.app.servicos.service.OrdemDeServicoService;
 import org.springframework.beans.factory.annotation.Autowired;
