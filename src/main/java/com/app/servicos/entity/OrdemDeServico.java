@@ -1,5 +1,6 @@
 package com.app.servicos.entity;
 
+import com.app.servicos.enums.StatusServico;
 import com.app.servicos.enums.TipoCliente;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -38,6 +39,10 @@ public class OrdemDeServico {
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_cliente")
     private TipoCliente tipoCliente;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status_servico")
+    private StatusServico statusServico = StatusServico.ABERTO;
 
     @ManyToOne
     @JoinColumn(name = "cliente_pj_id")
