@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping("/calculo-total")
 public class CalculadoraCustoController {private final CalculadoraCustoService calculadoraCustoService;
@@ -16,8 +18,8 @@ public class CalculadoraCustoController {private final CalculadoraCustoService c
     }
 
     @GetMapping("/{ordemDeServicoId}")
-    public ResponseEntity<Double> calcularCustoTotal(@PathVariable Long ordemDeServicoId) {
-        double custoTotal = calculadoraCustoService.calcularCustoTotal(ordemDeServicoId);
+    public ResponseEntity<BigDecimal> calcularCustoTotal(@PathVariable Long ordemDeServicoId) {
+        var custoTotal = calculadoraCustoService.calcularCustoTotal(ordemDeServicoId);
         return ResponseEntity.ok(custoTotal);
     }
 }

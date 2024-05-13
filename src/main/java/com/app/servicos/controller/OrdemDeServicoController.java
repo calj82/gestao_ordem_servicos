@@ -1,7 +1,7 @@
 package com.app.servicos.controller;
 
+import com.app.servicos.dto.response.OrdemResponseDTO;
 import com.app.servicos.entity.OrdemDeServico;
-import com.app.servicos.enums.StatusServico;
 import com.app.servicos.enums.TipoCliente;
 import com.app.servicos.service.OrdemDeServicoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +28,12 @@ public class OrdemDeServicoController {
                                                                         @RequestBody OrdemDeServico ordemDeServico) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ordemDeServicoService.criarOrdemDeServico(clienteId, tipoCliente, ordemDeServico));
     }
+
     @GetMapping
-    public ResponseEntity<List<OrdemDeServico>> listarOrdensDeServico() {
+    public ResponseEntity<List<OrdemResponseDTO>> listarOrdensDeServico() {
         return ordemDeServicoService.listarOrdensDeServico()
-               .map(ResponseEntity::ok)
-               .orElse(ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")

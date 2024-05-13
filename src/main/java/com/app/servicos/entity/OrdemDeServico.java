@@ -3,9 +3,11 @@ package com.app.servicos.entity;
 import com.app.servicos.enums.StatusServico;
 import com.app.servicos.enums.TipoCliente;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -14,6 +16,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrdemDeServico {
 
     @Id
@@ -28,13 +31,13 @@ public class OrdemDeServico {
     private LocalDate dataServico;
 
     @Column(name =  "custo_servico")
-    private double custoServico;
+    private BigDecimal custoServico;
 
     @Column(name =  "custo_adicional")
-    private double custoAdicional;
+    private BigDecimal custoAdicional;
 
     @Column(name =  "custo_total")
-    private double custoTotal;
+    private BigDecimal custoTotal;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_cliente")
