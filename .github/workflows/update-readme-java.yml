@@ -24,10 +24,24 @@ jobs:
 
       - name: Update README
         run: |
-          echo "Documentação atualizada em $(date)" >> README.md
-          PR_TITLE=$(git log -1 --pretty=%B)
-          echo "## Changelog" >> README.md
-          echo "- ${PR_TITLE}" >> README.md
+           ## Descrição do projeto - Read-me em teste!
+           echo "Documentação atualizada em $(date)" >> README.md
+           PR_TITLE=$(git log -1 --pretty=%B)
+           echo "## Changelog" >> README.md
+           echo "- ${PR_TITLE}" >> README.md
+          
+           ## Adiciona a versão atual do projeto
+           PROJECT_VERSION=$(git describe --tags `git rev-list --tags --max-count=1`)
+           echo "## Versão Atual" >> README.md
+           echo "- ${PROJECT_VERSION}" >> README.md
+          
+           ## Lista de autores das mudanças
+           echo "## Autores das Mudanças" >> README.md
+           git log --format="%an" | sort | uniq | while read author; do echo "- ${author}"; done >> README.md
+          
+           ## Link para a documentação gerada - em teste
+           echo "## Documentação" >> README.md
+           echo "- [Javadoc](path/to/javadoc/index.html)" >> README.md
 
       - name: Archive README
         uses: actions/upload-artifact@v2
